@@ -3,15 +3,15 @@
 % ==================
 % 5 MHz sampling times 896us PRT = 4480 gates for the short PRT pulse
 % 5 MHz sampling times 3,104us PRT = 15520 gates per pulse
-num_short_gates = 4480;
-num_gates = 15520;
+num_gates = 4480;
+num_long_gates = 15520;
 
 % we have 5 * 18 = 90 azimuth angles
 num_az = 90;
 
 % and 15 pulses with 3.104us PRT
-num_short_pulses = 44;
-num_pulses = 15;
+num_pulses = 44;
+num_long_pulses = 15;
 
 % that makes the range per gate (T_s*c)/2 ~30 m.
 delr = 29.976;
@@ -36,16 +36,16 @@ radar = 'PAR';
 fid=fopen('parEast22Oct.bin', 'r', 'l');
 
 % now get rid of the short PRT pulses
-short_pulse_num_per_segment = 2 * num_az / 5 * num_short_gates * num_short_pulses;
-long_pulse_num_per_segment = 2 * num_az / 5 * num_gates * num_pulses;
+short_pulse_num_per_segment = 2 * num_az / 5 * num_gates * num_pulses;
+long_pulse_num_per_segment = 2 * num_az / 5 * num_long_gates * num_long_pulses;
 total_pulses_per_segment = short_pulse_num_per_segment + long_pulse_num_per_segment;
 
 % read the first sweep out of the file
 frewind(fid);
 for ii=0:4
-	fseek(fid, (total_pulses_per_segment*ii+1)*2, 'bof');	
-	Y(long_pulse_num_per_segment*ii+1:long_pulse_num_per_segment*ii+long_pulse_num_per_segment) = ...
-		fread(fid, long_pulse_num_per_segment, 'uint16');
+	fseek(fid, (total_pulses_per_segment*ii+1+long_pulse_num_per_segment), 'bof');	
+	Y(short_pulse_num_per_segment*ii+1:short_pulse_num_per_segment*(ii+1)) = ...
+		fread(fid, short_pulse_num_per_segment, 'uint16');
 end
 
 Y=Y';
@@ -68,7 +68,6 @@ Y = double(Y);
 Y = Y(1:2:end) + j*Y(2:2:end);
 
 % reshape the array into a gates x pulses x azimuth 3D matrix
-% Y = reshape(Y, num_gates, num_pulses, num_az);
 Y = reshape(Y, num_gates, num_pulses, num_az);
 
 % and permute that into the right order of azimuth x gates x pulse
