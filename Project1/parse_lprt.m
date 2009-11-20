@@ -44,7 +44,7 @@ total_pulses_per_segment    = short_pulse_num_per_segment + long_pulse_num_per_s
 % read the first sweep out of the file
 frewind(fid);
 for ii=0:4
-	fseek(fid, total_pulses_per_segment*ii+1, 'bof');	
+	fseek(fid, (total_pulses_per_segment*ii+1)*2, 'bof');	
 	Y(long_pulse_num_per_segment*ii+1:long_pulse_num_per_segment*(ii+1)) = ...
 		fread(fid, long_pulse_num_per_segment, 'uint16');
 end
@@ -95,6 +95,20 @@ for ii=0:4
 	X(ii*18+18,:,:) = Y(ii*18+17,:,:);
 	X(ii*18+9,:,:)  = Y(ii*18+18,:,:);
 end
+
+% convert our cylindrical coordinates of angle and range into rectangular ones
+% for plotting
+el_rad = el/180*pi; 
+[r,az_rad] = meshgrid(([0:num_gates-1]*delr+r_min)/1e3,az_set/180*pi); 
+x = r*cos(el_rad).*sin(az_rad); 
+y = r*cos(el_rad).*cos(az_rad); 
+z = r*sin(el_rad);
+
+% multiply each gate per az per pulse with its complex conjugate to get power,
+% then take the mean across all pulses. Save the result in a num_az x num_gates matrix and
+% convert to dB.
+R0=mean(X(:,:,1:num_pulses).*conj(X(:,:,1:num_pulses)),3);
+pow=10*log10(R0);
 
 % clear up all the temp vars and save the data to a file,
 % so we don't have to process this stuff again.
