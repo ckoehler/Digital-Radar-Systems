@@ -1,6 +1,8 @@
 % ==================
 % = Parse the data =
 % ==================
+clear;
+
 % 5 MHz sampling times 896us PRT = 4480 gates for the short PRT pulse
 % 5 MHz sampling times 3,104us PRT = 15520 gates per pulse
 num_gates = 4480;
@@ -20,7 +22,6 @@ delr = 29.976;
 r_min = 10500;
 
 % build the set of azimuth angles, with 0 degrees being North, etc.
-% For simplicity, let's start at 1 degree for now.
 az_set = 45:num_az+45-1;
 
 % elevation for the first sweep was 0.5 degrees
@@ -35,7 +36,7 @@ radar = 'PAR';
 % open the file in little endian format
 fid=fopen('parEast22Oct.bin', 'r', 'l');
 
-% now get rid of the short PRT pulses
+% calculate data lengths to figure out what exactly to read
 short_pulse_num_per_segment = 2 * num_az / 5 * num_gates * num_pulses;
 long_pulse_num_per_segment = 2 * num_az / 5 * num_long_gates * num_long_pulses;
 total_pulses_per_segment = short_pulse_num_per_segment + long_pulse_num_per_segment;
@@ -101,5 +102,6 @@ clear Y;
 clear fid;
 clear ii;
 clear L;
+clear neg;
 
 save par_el0.5_sprt.mat
