@@ -139,7 +139,7 @@ P_y = V_y.^2*50;
 x = 10*log10(P_x);
 y = 10*log10(P_y);
 figure(1)
-subplot(2,1,1);
+subplot(2,2,1);
 plot(x, y);
 xlabel('Input Power / dB');
 ylabel('Output Power / dB');
@@ -166,7 +166,7 @@ P2 = polyfit(V_x, V_y, 3);
 % ==========
 V_x_new1 = polyval(P1,V_x);
 V_x_new2 = polyval(P2,V_x);
-% subplot(2,1,2);
+subplot(2,2,2);
 plot(V_x, V_y, 'b', V_x, V_x_new1, 'g', V_x, V_x_new2, 'r');
 legend('lab data', '5th degree poly', '3rd degree poly');
 xlabel('Vin / V');
@@ -206,18 +206,17 @@ outpower = 10*log10(voutrms*voutrms*1000/50);
 
 gain = outpower - inpower;
 
-figure(2);
+subplot(2,2,3);
 plot(v, res);
-
-figure(3);
 
 freq= ((-ceil((N-1)/2):N-1-ceil((N-1)/2) )/(N*1/Fs))/10^6;
 spectrum = fftshift(abs(fft(res))) ;
-spectrumdb = 10*log10(spectrum*1000) - 95.16;
-plot(freq,spectrum);
+spectrumdb = 10*log10(spectrum) - 65.18;
+subplot(2,2,4);
+plot(freq,spectrumdb);
 axis([0 800 -60 10]);
 xlabel('Freq / MHz');
 ylabel('Power / dBm')
 
 
-specoutpower = 10*log10(spectrum)
+specoutpower = 10*log10(sum(spectrum)^2/50/N);
