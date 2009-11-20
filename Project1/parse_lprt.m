@@ -21,7 +21,6 @@ delr = 29.976;
 r_min = 10500;
 
 % build the set of azimuth angles, with 0 degrees being North, etc.
-% For simplicity, let's start at 1 degree for now.
 az_set = 45:num_az+45-1;
 
 % elevation for the first sweep was 0.5 degrees
@@ -36,15 +35,15 @@ radar = 'PAR';
 % open the file in little endian format
 fid=fopen('parEast22Oct.bin', 'r', 'l');
 
-% now get rid of the short PRT pulses
+% calculate data lengths to figure out what exactly to read
 short_pulse_num_per_segment = 2 * num_az / 5 * num_short_gates * num_short_pulses;
-long_pulse_num_per_segment = 2 * num_az / 5 * num_gates * num_pulses;
-total_pulses_per_segment = short_pulse_num_per_segment + long_pulse_num_per_segment;
+long_pulse_num_per_segment  = 2 * num_az / 5 * num_gates * num_pulses;
+total_pulses_per_segment    = short_pulse_num_per_segment + long_pulse_num_per_segment;
 
 % read the first sweep out of the file
 frewind(fid);
 for ii=0:4
-	fseek(fid, (total_pulses_per_segment*ii+1), 'bof');	
+	fseek(fid, total_pulses_per_segment*ii+1, 'bof');	
 	Y(long_pulse_num_per_segment*ii+1:long_pulse_num_per_segment*(ii+1)) = ...
 		fread(fid, long_pulse_num_per_segment, 'uint16');
 end
@@ -69,7 +68,6 @@ Y = double(Y);
 Y = Y(1:2:end) + j*Y(2:2:end);
 
 % reshape the array into a gates x pulses x azimuth 3D matrix
-% Y = reshape(Y, num_gates, num_pulses, num_az);
 Y = reshape(Y, num_gates, num_pulses, num_az);
 
 % and permute that into the right order of azimuth x gates x pulse
@@ -97,11 +95,12 @@ for ii=0:4
 	X(ii*18+9,:,:)  = Y(ii*18+18,:,:);
 end
 
-% clear up all the temp stuff and save the data to a file,
+% clear up all the temp vars and save the data to a file,
 % so we don't have to process this stuff again.
 clear Y;
 clear fid;
 clear ii;
 clear L;
+clear neg;
 
 save par_el0.5_lprt.mat
