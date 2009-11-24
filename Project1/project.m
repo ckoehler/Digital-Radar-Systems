@@ -5,17 +5,6 @@ clear;
 load par_el0.5_lprt.mat;
 P1 = pow;
 
-figure(1)
-% now plot the result.
-pcolor([x],[y],[P1]);
-shading flat;
-axis equal;
-axis([-350 350 -350 350]);
-colormap(jet);
-colorbar;
-caxis([0 60]);
-
-
 % now adjust for range to get reflectivity
 Radjusted = R0;
 Rneg = Radjusted <= 1;
