@@ -21,12 +21,13 @@ C = 25;
 Z(Zstuff) = Z(Zstuff) - C;
 Z(:,1:1500) = 0;
 
-figure(2);
 pcolor([x],[y],[abs(Z)]);
 shading flat;
 axis equal;
 axis([-350 350 -350 350]);
-colormap(jet);
+cmap = colormap(jet);
+cmap(1,:) = [0 0 0];
+colormap(cmap);
 colorbar;
 title('Reflectivity factor @ 0.5 el');
 caxis([0 60]);
