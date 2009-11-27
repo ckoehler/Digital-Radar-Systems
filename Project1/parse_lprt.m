@@ -4,24 +4,24 @@
 clear;
 
 % 5 MHz sampling times 896us PRT = 4480 gates for the short PRT pulse
-% 5 MHz sampling times 3,104us PRT = 15520 gates per pulse
+% 5 MHz sampling times 3,104us PRT = 15520 gates per long PRT pulse
 num_short_gates = 4480;
 num_gates = 15520;
 
 % we have 5 * 18 = 90 azimuth angles
 num_az = 90;
 
-% and 15 pulses with 3.104us PRT
+% and 15 pulses with 3.104us PRT, 44 pulses with 896us PRT
 num_short_pulses = 44;
 num_pulses = 15;
 
 % that makes the range per gate (T_s*c)/2 ~30 m.
 delr = 29.976;
 
-% set minimum distance at 10km
+% set minimum distance at 10.5 km
 r_min = 10500;
 
-% build the set of azimuth angles, with 0 degrees being North, etc.
+% build the set of azimuth angles, with 0 degrees being North, 180 South, etc.
 az_set = 45:num_az+45-1;
 
 % elevation for the first sweep was 0.5 degrees
@@ -71,7 +71,7 @@ Y = Y(1:2:end) + j*Y(2:2:end);
 % reshape the array into a gates x pulses x azimuth 3D matrix
 Y = reshape(Y, num_gates, num_pulses, num_az);
 
-% and permute that into the right order of azimuth x gates x pulse
+% and permute that into the right order of azimuth x gates x pulses
 Y = permute(Y, [3 1 2]);
 
 % then deinterleave the azimuth angles and save in X
